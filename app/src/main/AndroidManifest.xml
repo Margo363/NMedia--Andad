@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ru.netology.nmedia">
 
-
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -35,11 +34,11 @@
             </intent-filter>
         </service>
 
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            tools:node="remove">
-        </provider>
+        <!--        <provider-->
+        <!--            android:name="androidx.startup.InitializationProvider"-->
+        <!--            android:authorities="${applicationId}.androidx-startup"-->
+        <!--            tools:node="remove">-->
+        <!--        </provider>-->
 
     </application>
 

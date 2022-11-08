@@ -1,23 +1,41 @@
 package ru.netology.nmedia.application
 
 import android.app.Application
-import androidx.work.*
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import dagger.Lazy
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.netology.nmedia.di.DependencyContainer
-import ru.netology.nmedia.work.RefreshPostsWorker
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.work.RefreshPostsWorker
 
-
-class NMediaApplication : Application() {
+@HiltAndroidApp
+class NMediaApplication : Application(), Configuration.Provider {
     private val appScope = CoroutineScope(Dispatchers.Default)
+
+    @Inject
+    lateinit var auth: AppAuth
+
+    @Inject
+    lateinit var workManager: Lazy<WorkManager>
+
+    @Inject
+    lateinit var workerFactory: Lazy<HiltWorkerFactory>
+
 
     override fun onCreate() {
         super.onCreate()
         setupAuth()
         setupWork()
-//        DependencyContainer.initApp(this)
     }
 
     private fun setupWork() {
@@ -30,7 +48,7 @@ class NMediaApplication : Application() {
                 .setConstraints(constraints)
                 .build()
 
-            WorkManager.getInstance(this@NMediaApplication).enqueueUniquePeriodicWork(
+            workManager.get().enqueueUniquePeriodicWork(
                 RefreshPostsWorker.name,
                 ExistingPeriodicWorkPolicy.KEEP,
                 request
@@ -40,7 +58,13 @@ class NMediaApplication : Application() {
 
     private fun setupAuth() {
         appScope.launch {
-            DependencyContainer.initApp(this@NMediaApplication)
+            auth.sendPushToken()
         }
+    }
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory.get())
+            .build()
     }
 }

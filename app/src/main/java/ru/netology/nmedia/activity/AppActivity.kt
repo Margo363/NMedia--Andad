@@ -1,31 +1,35 @@
 package ru.netology.nmedia.activity
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.navigation.findNavController
-import com.google.firebase.FirebaseApp
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailabilityLight
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.AuthViewModel
-import ru.netology.nmedia.viewmodel.ViewModelFactory
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
-    private val dependencyContainer = DependencyContainer.getInstance()
-    private val viewModel: AuthViewModel by viewModels(factoryProducer = {
-        ViewModelFactory(
-            dependencyContainer.repositoryImpl,
-            dependencyContainer.appAuth,
-            dependencyContainer.workManager
-        )
-    })
+
+    @Inject
+    lateinit var appAuth: AppAuth
+
+    @Inject
+    lateinit var firebaseMessaging: FirebaseMessaging
+
+    @Inject
+    lateinit var googleApiAvailability: GoogleApiAvailabilityLight
+
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +41,34 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             }
         }
 
+
         viewModel.data.observe(this) {
             invalidateOptionsMenu()
         }
 
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
-            println("ellina $it")
+        checkGoogleApiAvailability()
+    }
+
+    private fun checkGoogleApiAvailability() {
+        with(googleApiAvailability) {
+            val code = isGooglePlayServicesAvailable(this@AppActivity)
+            if (code == ConnectionResult.SUCCESS) {
+                return@with
+            }
+            if (isUserResolvableError(code)) {
+                getErrorString(code)
+                return
+            }
+            Toast.makeText(
+                this@AppActivity,
+                R.string.google_play_unavailable,
+                Toast.LENGTH_LONG
+            )
+                .show()
+        }
+
+        firebaseMessaging.token.addOnSuccessListener {
+            println(it)
         }
     }
 
@@ -68,12 +94,10 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 true
             }
             R.id.sign_out -> {
-                dependencyContainer.appAuth.removeAuth()
+                appAuth.removeAuth()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-
 }

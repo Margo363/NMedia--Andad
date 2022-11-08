@@ -6,14 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.viewmodel.PostViewModel
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.card_post.*
 import kotlinx.android.synthetic.main.card_post.view.*
 import kotlinx.android.synthetic.main.fragment_feed.*
@@ -22,32 +20,25 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.PostCallback
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
-import ru.netology.nmedia.di.DependencyContainer
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.enumeration.RetryType
 import ru.netology.nmedia.viewmodel.AuthViewModel
-import ru.netology.nmedia.viewmodel.ViewModelFactory
+import ru.netology.nmedia.viewmodel.PostViewModel
 
-
-
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
-    private val dependencyContainer = DependencyContainer.getInstance()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
 
         val viewModel: PostViewModel by viewModels(
-            ownerProducer = ::requireParentFragment,
-            factoryProducer = {
-                ViewModelFactory(
-                    dependencyContainer.repositoryImpl,
-                    dependencyContainer.appAuth,
-                    dependencyContainer.workManager
-                )
-            })
+            ownerProducer = ::requireParentFragment
+        )
 
 
         val viewModelAuth: AuthViewModel by viewModels()
@@ -138,7 +129,6 @@ class FeedFragment : Fragment() {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.retry_loading) {
                         when (state.retryType) {
-                            RetryType.SAVE -> viewModel.retrySave(state.retryPost)
                             RetryType.REMOVE -> viewModel.removeById(state.retryId)
                             RetryType.LIKE -> viewModel.likeById(state.retryId)
                             RetryType.UNLIKE -> viewModel.unlikeById(state.retryId)
@@ -199,7 +189,6 @@ class FeedFragment : Fragment() {
     }
 
 }
-
 
 
 

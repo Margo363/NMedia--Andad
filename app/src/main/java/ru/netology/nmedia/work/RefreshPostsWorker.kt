@@ -1,21 +1,24 @@
 package ru.netology.nmedia.work
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 
-
-class RefreshPostsWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    private val repository: PostRepository
+@HiltWorker
+class RefreshPostsWorker @AssistedInject constructor(
+    private val repository: PostRepository,
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters
 ) :
     CoroutineWorker(appContext, params) {
 
@@ -35,19 +38,4 @@ class RefreshPostsWorker(
     }
 }
 
-class RefreshPostsWorkerFactory(private val repository: PostRepository) : WorkerFactory() {
-    override fun createWorker(
-        appContext: Context,
-        workerClassName: String,
-        workerParameters: WorkerParameters
-    ): ListenableWorker? = when (workerClassName) {
-        RefreshPostsWorker::class.java.name -> RefreshPostsWorker(
-            appContext,
-            workerParameters,
-            repository
-        )
-        else -> null
-    }
-
-}
 

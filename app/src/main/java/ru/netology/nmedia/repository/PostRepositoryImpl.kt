@@ -21,8 +21,14 @@ import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
+import javax.inject.Inject
 
-class PostRepositoryImpl(private val postDao: PostDao, private val postWorkDao: PostWorkDao, private val apiService: ApiService) :
+
+class PostRepositoryImpl @Inject constructor(
+    private val postDao: PostDao,
+    private val postWorkDao: PostWorkDao,
+    private val apiService: ApiService
+) :
     PostRepository {
 
     override val data: Flow<List<Post>> = postDao.getAll()

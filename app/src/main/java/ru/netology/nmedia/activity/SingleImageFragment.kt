@@ -10,11 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.fragment_single_image.*
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSingleImageBinding
-
-
 
 class SingleImageFragment : Fragment() {
     override fun onCreateView(

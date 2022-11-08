@@ -8,17 +8,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.SignUpFragmentBinding
-import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.SignUpViewModel
-import ru.netology.nmedia.viewmodel.SignViewModelFactory
-import ru.netology.nmedia.viewmodel.ViewModelFactory
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SignUpFragment : Fragment() {
-    private val dependencyContainer = DependencyContainer.getInstance()
+
+    @Inject
+    lateinit var appAuth: AppAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,13 +27,10 @@ class SignUpFragment : Fragment() {
     ): View {
         val binding = SignUpFragmentBinding.inflate(inflater, container, false)
 
-        val viewModel: SignUpViewModel by viewModels( factoryProducer = {
-            SignViewModelFactory(
-                dependencyContainer.repositoryAuth
-            )})
+        val viewModel: SignUpViewModel by viewModels()
 
         viewModel.data.observe(viewLifecycleOwner, {
-            dependencyContainer.appAuth.setAuth(
+            appAuth.setAuth(
                 it.id,
                 it.token
             )

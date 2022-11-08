@@ -1,13 +1,17 @@
 package ru.netology.nmedia.repository
 
+
 import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
+import javax.inject.Inject
 
-class AuthRepository (private val apiService: ApiService) {
+class AuthRepository @Inject constructor(
+    private val apiService: ApiService
+) {
     suspend fun authUser(login: String, password: String): User {
         try {
             val response = apiService.authUser(login, password)

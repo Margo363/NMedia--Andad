@@ -4,12 +4,12 @@ import android.net.Uri
 import androidx.core.net.toFile
 import androidx.lifecycle.*
 import androidx.work.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.enumeration.RetryType
@@ -21,7 +21,7 @@ import ru.netology.nmedia.utils.SingleLiveEvent
 import ru.netology.nmedia.work.RemovePostWorker
 import ru.netology.nmedia.work.SavePostWorker
 import java.io.File
-
+import javax.inject.Inject
 
 private val emptyPost = Post(
     id = 0,
@@ -36,7 +36,9 @@ private val emptyPost = Post(
     sharesCount = 0
 )
 
-class PostViewModel(
+@ExperimentalCoroutinesApi
+@HiltViewModel
+class PostViewModel @Inject constructor(
     private val repository: PostRepository,
     private val appAuth: AppAuth,
     private val workManager: WorkManager
@@ -109,19 +111,6 @@ class PostViewModel(
         }
     }
 
-    fun retrySave(post: Post?) {
-        viewModelScope.launch {
-            try {
-                if (post != null) {
-                    DependencyContainer.getInstance().apiService.save(post)
-                    refreshPosts()
-                }
-            } catch (e: Exception) {
-                _dataState.value =
-                    FeedModelState(error = true, retryType = RetryType.SAVE, retryPost = post)
-            }
-        }
-    }
 
     fun save() {
         edited.value?.let {

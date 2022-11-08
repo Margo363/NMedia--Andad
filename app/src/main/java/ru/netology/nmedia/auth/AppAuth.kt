@@ -3,6 +3,11 @@ package ru.netology.nmedia.auth
 import android.content.Context
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,11 +15,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import ru.netology.nmedia.di.DependencyContainer
+import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.dto.PushToken
+import javax.inject.Inject
+import javax.inject.Singleton
 
-
-class AppAuth(context: Context) {
+@Singleton
+class AppAuth @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
     private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     private val idKey = "id"
     private val tokenKey = "token"
@@ -40,11 +49,19 @@ class AppAuth(context: Context) {
 
     val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
 
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface AppAuthEntryPoint {
+        fun getApiService(): ApiService
+    }
+
     fun sendPushToken(token: String? = null) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val token = PushToken(token ?: Firebase.messaging.token.await())
-                DependencyContainer.getInstance().apiService.save(token)
+                val entryPoint =
+                    EntryPointAccessors.fromApplication(context, AppAuthEntryPoint::class.java)
+                entryPoint.getApiService().save(token)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
