@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.NewPostFragment">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                android:padding="@dimen/common_spacing"
+
+                tools:text="Силосные фильтры серии LSF являются оптимальным решением проблемы очистки запыленного воздуха, отводимого от закрытых емкостей хранения сыпучих материалов, а также от отдельных узлов технологического оборудования. Высокоэффективно применение фильтров LSF в тех случаях, когда протяженность технологической линии, большие расстояния между отдельными агрегатами, как по площади, так и по высоте, делают нецелесообразной устройство одной централизованной системы аспирации.
+
+Фильтры LSF могут эксплуатироваться в тяжелых условиях для фильтрации мелкодисперсных, абразивных и агрессивных запылений.
+
+Фильтры серии LSF предназначены для работы в условиях средней и высокой входной запыленности.
+
+Особенности фильтров.
+
+Круглый корпус и оптимальное расстояние между рукавами позволяют равномерно распределяться очищаемому воздуху;
+Возможность установки в качестве фильтроэлементов как цилиндрических рукавов, так и гофрированных картриджей для одного и того же корпуса, расширяя диапазон применения как по воздушной нагрузке, так и по начальной концентрации загрязняющих веществ.
+Вертикальное расположение фильтроэлементов
+Два варианта исполнения фильтра:
+— с присоединительным фланцем в нижней части корпуса, с помощью которого фильтр устанавливается на патрубок отверстия в крыше обслуживаемого силоса;
+
+— с опорными конструкциями, накопительным бункером и разгрузочным механизмом, позволяющее использовать данный фильтр как отдельно стоящий, с присоединением к нему аспирационного воздуховода от технологического оборудования и выгрузкой уловленной пыли в собственную емкость, либо в централизованную систему транспортировки пыли.
+
+В фильтрах LSF применяется наиболее эффективный на данный момент способ регенерации фильтроэлементов – импульсная продувка сжатым воздухом, позволяющая очистить наружную поверхность фильтровального материала даже от слеживающихся и слипающихся пылей.
+В стандартную комплектацию входит:
+
+Цилиндрический корпус с высококачественным многослойным антикоррозионным покрытием;
+Пневматическая система регенерации фильтровальных элементов с автоматикой управления с возможностью настройки.
+Комплект фильтроэлементов – рукавов с проволочным каркасом, либо гофрированных картриджей из высококачественного фильтровального материала, подбираемого индивидуально под особенности объекта заказчика.
+В дополнительную комплектацию может входить:
+
+Оснащение вентилятором
+Оснащение опорными конструкциями и накопительным бункером с требуемыми устройствами выгрузки;
+Высокотемпературное исполнение до 240°С;
+Взрывозащищенное исполнение;
+Теплоизоляция корпуса;
+Система обогрева пневмоклапанов;
+Площадка обслуживания;
+Другие опции по требованиям заказчика." />
+
+            <FrameLayout
+                android:id="@+id/photoContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@string/description_photo" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/removePhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:text="@string/remove"
+                    />
+
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/common_spacing"
+        android:layout_marginEnd="@dimen/common_spacing"
+        android:background="@color/divider_color"
+        app:layout_constraintBottom_toTopOf="@id/buttonPanel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/buttonPanel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pickPhoto"
+            style="@style/Widget.AppTheme.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_select_photo"
+            android:padding="@dimen/common_spacing"
+            app:icon="@drawable/ic_baseline_image_24" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/takePhoto"
+            style="@style/Widget.AppTheme.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_take_photo"
+            android:padding="@dimen/common_spacing"
+            app:icon="@drawable/ic_baseline_camera_alt_24" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
