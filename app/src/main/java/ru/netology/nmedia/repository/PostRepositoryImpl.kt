@@ -3,19 +3,24 @@ package ru.netology.nmedia.repository
 import android.net.Uri
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import ru.netology.nmedia.dao.PostDao
-import ru.netology.nmedia.entity.PostEntity
-import ru.netology.nmedia.entity.toEntity
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nmedia.api.ApiService
+import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dao.PostWorkDao
 import ru.netology.nmedia.dto.*
+import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.PostWorkEntity
-import ru.netology.nmedia.entity.toDto
+import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
@@ -31,9 +36,15 @@ class PostRepositoryImpl @Inject constructor(
 ) :
     PostRepository {
 
-    override val data: Flow<List<Post>> = postDao.getAll()
-        .map { it.toDto() }
-        .flowOn(Dispatchers.Default)
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            PostPagingSource(apiService)
+        }
+    ).flow
 
 
     override suspend fun getAll() {

@@ -12,12 +12,9 @@ import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Media
 import retrofit2.http.POST
-
 import retrofit2.http.FormUrlEncoded
 import ru.netology.nmedia.dto.PushToken
 import ru.netology.nmedia.dto.User
-
-
 
 interface ApiService {
     @POST("users/push-tokens")
@@ -25,6 +22,12 @@ interface ApiService {
 
     @GET("posts")
     suspend fun getAll(): Response<List<Post>>
+
+    @GET("posts/latest")
+    suspend fun getLatest(@Query("count") count: Int): Response<List<Post>>
+
+    @GET("posts/{id}/before")
+    suspend fun getBefore(@Path("id") id: Long, @Query("count") count: Int): Response<List<Post>>
 
     @GET("posts/{id}/newer")
     suspend fun getNewer(@Path("id") id: Long): Response<List<Post>>

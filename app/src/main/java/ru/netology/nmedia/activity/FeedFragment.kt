@@ -9,13 +9,20 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.card_post.*
 import kotlinx.android.synthetic.main.card_post.view.*
 import kotlinx.android.synthetic.main.fragment_feed.*
 import kotlinx.android.synthetic.main.fragment_feed.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.PostCallback
 import ru.netology.nmedia.adapter.PostsAdapter
@@ -28,7 +35,7 @@ import ru.netology.nmedia.viewmodel.PostViewModel
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
 
-
+    @ExperimentalCoroutinesApi
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -112,15 +119,20 @@ class FeedFragment : Fragment() {
         binding.list.adapter = adapter
         binding.list.animation = null // отключаем анимацию
 
-
-        viewModel.data.observe(viewLifecycleOwner, { state ->
-            val listComparison = adapter.itemCount < state.posts.size
-            adapter.submitList(state.posts) {
-                if (listComparison) binding.list.scrollToPosition(0)
+        lifecycleScope.launchWhenCreated {
+            viewModel.data.collectLatest {
+                adapter.submitData(it)
             }
+        }
 
-            binding.emptyText.isVisible = state.empty
-        })
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest {
+                binding.swiperefresh.isRefreshing =
+                    it.prepend is LoadState.Loading ||
+                            it.append is LoadState.Loading ||
+                            it.refresh is LoadState.Loading
+            }
+        }
 
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
@@ -139,17 +151,19 @@ class FeedFragment : Fragment() {
             }
         }
 
-        viewModel.newerCount.observe(viewLifecycleOwner) {
-            with(binding.newEntry) {
-                if (it > 0) {
-                    text = "${getString(R.string.new_posts)} $it"
-                    visibility = View.VISIBLE
-                }
-            }
-        }
+//        viewModel.newerCount.observe(viewLifecycleOwner) {
+//            with(binding.newEntry) {
+//                if (it > 0) {
+//                    text = "${getString(R.string.new_posts)} $it"
+//                    visibility = View.VISIBLE
+//                }
+//            }
+//        }
+
+        viewModelAuth.data.observe(viewLifecycleOwner) { adapter.refresh() }
 
         binding.swiperefresh.setOnRefreshListener {
-            viewModel.refreshPosts()
+            adapter.refresh()
             binding.newEntry.visibility = View.GONE
         }
 
@@ -157,11 +171,6 @@ class FeedFragment : Fragment() {
             binding.newEntry.visibility = View.GONE
             viewModel.loadNewPosts()
         }
-//
-//        binding.retryButton.setOnClickListener {
-//            viewModel.loadPosts()
-//        }
-
 
         viewModel.edited.observe(viewLifecycleOwner) { post ->
             if (post.id == 0L) {
@@ -179,9 +188,15 @@ class FeedFragment : Fragment() {
         }
 
 
-        binding.swiperefresh.setOnRefreshListener {
-            viewModel.loadPosts()
-            swiperefresh.isRefreshing = false
+        //скроллинг постов
+        lifecycleScope.launch {
+            val shouldScrollToTop = adapter.loadStateFlow
+                .distinctUntilChangedBy { it.source.refresh }
+                .map { it.source.refresh is LoadState.NotLoading }
+
+            shouldScrollToTop.collectLatest { shouldScroll ->
+                if (shouldScroll) binding.list.scrollToPosition(0)
+            }
         }
 
 
