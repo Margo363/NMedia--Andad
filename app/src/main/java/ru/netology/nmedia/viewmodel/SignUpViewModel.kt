@@ -6,7 +6,7 @@ import kotlinx.coroutines.*
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.netology.nmedia.dto.User
-import ru.netology.nmedia.model.FeedModelState
+import ru.netology.nmedia.module.FeedModelState
 import ru.netology.nmedia.repository.AuthRepository
 import javax.inject.Inject
 

@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.map
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSinglePostBinding
@@ -22,11 +21,10 @@ import ru.netology.nmedia.viewmodel.PostViewModel
 @AndroidEntryPoint
 class SinglePostFragment : Fragment() {
 
-    @ExperimentalCoroutinesApi
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         val viewModel: PostViewModel by viewModels(
             ownerProducer = ::requireParentFragment
         )

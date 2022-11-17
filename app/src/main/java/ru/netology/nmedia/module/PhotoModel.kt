@@ -1,4 +1,4 @@
-package ru.netology.nmedia.model
+package ru.netology.nmedia.module
 
 
 import android.net.Uri

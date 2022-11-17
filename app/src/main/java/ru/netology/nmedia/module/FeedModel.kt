@@ -1,7 +1,6 @@
-package ru.netology.nmedia.model
+package ru.netology.nmedia.module
 
 
-import android.telephony.NetworkRegistrationInfo
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.enumeration.RetryType
 
